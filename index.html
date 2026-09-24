@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>waonline</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --card: #1a2234;
+      --border: #2a3550;
+      --accent: #25d366;
+      --accent2: #128c7e;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --blue: #3b82f6;
+      --tag-bg: #1e3a3a;
+      --tag-text: #4ade80;
+      --dm-bg: #1e2a1e;
+      --grp-bg: #1e2030;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===================== TOP BAR ===================== */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      height: 56px;
+      gap: 12px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--text); }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background 0.3s;
+    }
+
+    .status-pill.online { border-color: var(--accent); color: var(--accent); }
+    .status-pill.online .status-dot { background: var(--accent); animation: pulse 2s infinite; }
+    .status-pill.connecting .status-dot { background: var(--warn); }
+    .status-pill.connecting { color: var(--warn); border-color: var(--warn); }
+    .status-pill.qr_ready .status-dot { background: var(--blue); animation: pulse 1.5s infinite; }
+    .status-pill.qr_ready { color: var(--blue); border-color: var(--blue); }
+    .status-pill.error .status-dot { background: var(--danger); }
+    .status-pill.error { color: var(--danger); border-color: var(--danger); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    .topbar-spacer { flex: 1; }
+
+    .phone-badge {
+      font-size: 12px;
+      color: var(--muted);
+      display: none;
+    }
+
+    .phone-badge.show { display: block; }
+
+    .btn-sm {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-sm:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* ===================== MAIN LAYOUT ===================== */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ===================== LEFT PANEL ===================== */
+    .left-panel {
+      width: 340px;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .panel-section {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+
+    /* QR section */
+    #qr-section { text-align: center; }
+
+    #qrImg {
+      width: 200px;
+      height: 200px;
+      border-radius: 12px;
+      border: 2px solid var(--accent);
+      display: none;
+      margin: 0 auto 14px;
+      background: #fff;
+    }
+
+    #qrImg.show { display: block; }
+
+    .qr-hint {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    #qr-loading {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Divider */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .or-divider::before, .or-divider::after {
+      content: '';
+      flex: 1;
+      border-top: 1px solid var(--border);
+    }
+
+    .or-divider span { font-size: 11px; color: var(--muted); }
+
+    /* Pairing code form */
+    .form-group { margin-bottom: 10px; }
+
+    .form-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font);
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .form-input::placeholder { color: var(--muted); }
+    .form-input:focus { border-color: var(--accent); }
+
+    .btn-primary {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      font-family: var(--font);
+      letter-spacing: 0.3px;
+    }
+
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Pairing code display */
+    #pairingCodeBox {
+      background: var(--bg);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      display: none;
+      margin-top: 12px;
+    }
+
+    #pairingCodeBox.show { display: block; }
+
+    #pairingCode {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: var(--accent);
+      font-family: 'Courier New', monospace;
+    }
+
+    .pairing-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Connected panel */
+    #connected-section {
+      text-align: center;
+      display: none;
+    }
+
+    #connected-section.show { display: block; }
+
+    .connected-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 26px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .connected-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .connected-num {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .btn-danger {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+    }
+
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+
+    /* Server URL panel */
+    #server-panel .form-input[readonly] {
+      color: var(--muted);
+      cursor: default;
+      font-size: 11px;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-num { font-size: 22px; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ===================== MESSAGE FEED ===================== */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .feed-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .feed-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .msg-count-badge {
+      font-size: 11px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+
+    .feed-spacer { flex: 1; }
+
+    .clear-btn {
+      font-size: 11px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+    }
+
+    .clear-btn:hover { color: var(--danger); border-color: var(--danger); }
+
+    .msg-feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+
+    .msg-feed::-webkit-scrollbar { width: 4px; }
+    .msg-feed::-webkit-scrollbar-track { background: transparent; }
+    .msg-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* Empty state */
+    #empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      color: var(--muted);
+      gap: 10px;
+      padding: 40px;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      opacity: 0.2;
+    }
+
+    .empty-text { font-size: 14px; text-align: center; }
+
+    /* Message card */
+    .msg-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: slideIn 0.25s ease;
+      transition: border-color 0.2s;
+    }
+
+    .msg-card:hover { border-color: rgba(37, 211, 102, 0.3); }
+
+    .msg-card.dm-card { border-left: 3px solid var(--accent); background: var(--dm-bg); }
+    .msg-card.grp-card { border-left: 3px solid var(--blue); background: var(--grp-bg); }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .msg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .msg-avatar.dm { background: linear-gradient(135deg, #25d366, #128c7e); color: #fff; }
+    .msg-avatar.grp { background: linear-gradient(135deg, #3b82f6, #6366f1); color: #fff; }
+
+    .msg-sender {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .msg-type-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 99px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .tag-dm { background: var(--tag-bg); color: var(--tag-text); }
+    .tag-grp { background: #1e2a4a; color: #93c5fd; }
+
+    .msg-group-name {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .msg-time {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .msg-text {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.55;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .msg-text.media { color: var(--muted); font-style: italic; }
+
+    /* Notification toast */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 999;
+    }
+
+    .toast {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--text);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      animation: toastIn 0.3s ease;
+      max-width: 280px;
+    }
+
+    .toast.success { border-color: var(--accent); color: var(--accent); }
+    .toast.error { border-color: var(--danger); color: var(--danger); }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .left-panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      .layout { flex-direction: column; }
+      .right-panel { min-height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="logo">wa<span>online</span></div>
+    <div class="status-pill" id="statusPill">
+      <div class="status-dot"></div>
+      <span id="statusText">Offline</span>
+    </div>
+    <div class="phone-badge" id="phoneBadge"></div>
+    <div class="topbar-spacer"></div>
+    <button class="btn-sm" id="disconnectTopBtn" style="display:none" onclick="doDisconnect()">Disconnect</button>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="layout">
+
+    <!-- Left Panel -->
+    <div class="left-panel">
+
+      <!-- Server URL panel -->
+      <div class="panel-section" id="server-panel">
+        <div class="panel-title">Server Connection</div>
+        <div class="form-group">
+          <label class="form-label">wasev Server URL (auto-fetched)</label>
+          <input type="text" class="form-input" id="serverUrlInput" readonly placeholder="Fetching from GitHub..." />
+        </div>
+        <button class="btn-primary" id="refreshServerBtn" onclick="fetchAndConnect()" style="margin-top:4px">Reconnect</button>
+      </div>
+
+      <!-- Link device -->
+      <div class="panel-section" id="link-panel">
+        <div class="panel-title">Link Device</div>
+
+        <!-- QR Code -->
+        <div id="qr-section">
+          <img id="qrImg" alt="WhatsApp QR Code" />
+          <div id="qr-loading" class="qr-hint">Waiting for server to generate QR code...</div>
+          <p class="qr-hint" style="margin-top:8px">Open WhatsApp on your phone &gt; Linked Devices &gt; Link a Device &gt; Scan QR</p>
+        </div>
+
+        <div class="or-divider"><span>or use pairing code</span></div>
+
+        <!-- Pairing Code -->
+        <div class="form-group">
+          <label class="form-label">Phone number (with country code)</label>
+          <input type="tel" class="form-input" id="pairPhoneInput" placeholder="+91 9876543210" />
+        </div>
+        <button class="btn-primary" id="pairBtn" onclick="doPairing()">Get Pairing Code</button>
+
+        <div id="pairingCodeBox">
+          <div id="pairingCode">------</div>
+          <div class="pairing-hint">Enter this code on WhatsApp &gt; Linked Devices &gt; Link with phone number</div>
+        </div>
+      </div>
+
+      <!-- Connected state -->
+      <div class="panel-section" id="connected-section">
+        <div class="panel-title">Connected Account</div>
+        <div class="connected-avatar" id="connectedAvatar">W</div>
+        <div class="connected-name" id="connectedName">WhatsApp</div>
+        <div class="connected-num" id="connectedNum">+--</div>
+        <button class="btn-danger" onclick="doDisconnect()">Unlink Device</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="panel-section">
+        <div class="panel-title">Session Stats</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="statMessages">0</div>
+            <div class="stat-label">Messages</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="statChats">0</div>
+            <div class="stat-label">Chats</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Panel - Message Feed -->
+    <div class="right-panel">
+      <div class="feed-header">
+        <div class="feed-title">Live Message Feed</div>
+        <div class="msg-count-badge" id="msgCountBadge">0 messages</div>
+        <div class="feed-spacer"></div>
+        <button class="clear-btn" onclick="clearMessages()">Clear</button>
+      </div>
+
+      <div class="msg-feed" id="msgFeed">
+        <div id="empty-state">
+          <div class="empty-icon">&#x1F4AC;</div>
+          <div class="empty-text">No messages yet.<br>Link your WhatsApp account to start viewing messages.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    const GH_RAW_URL = 'https://raw.githubusercontent.com/yasamarium/wasev/main/server_url.txt';
+
+    let serverUrl = '';
+    let sse = null;
+    let messages = [];
+    let chatSet = new Set();
+    let currentStatus = 'offline';
+    let qrRefreshTimer = null;
+
+    // ---- Toast ----
+    function toast(msg, type) {
+      const el = document.createElement('div');
+      el.className = 'toast ' + (type || '');
+      el.textContent = msg;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+
+    // ---- Status update ----
+    function setStatus(status, phone) {
+      currentStatus = status;
+      const pill = document.getElementById('statusPill');
+      const text = document.getElementById('statusText');
+      const phoneBadge = document.getElementById('phoneBadge');
+      const disconnectBtn = document.getElementById('disconnectTopBtn');
+      const linkPanel = document.getElementById('link-panel');
+      const connSection = document.getElementById('connected-section');
+
+      pill.className = 'status-pill ' + (status || '');
+
+      if (status === 'online') {
+        text.textContent = 'Online';
+        phoneBadge.textContent = phone ? '+' + phone : '';
+        phoneBadge.classList.add('show');
+        disconnectBtn.style.display = 'block';
+        linkPanel.style.display = 'none';
+        connSection.classList.add('show');
+        document.getElementById('connectedNum').textContent = phone ? '+' + phone : '';
+        document.getElementById('connectedAvatar').textContent = phone ? phone.slice(-2) : 'W';
+        document.getElementById('connectedName').textContent = 'WhatsApp Connected';
+        clearInterval(qrRefreshTimer);
+      } else if (status === 'qr_ready') {
+        text.textContent = 'QR Ready';
+        linkPanel.style.display = 'block';
+        connSection.classList.remove('show');
+        disconnectBtn.style.display = 'none';
+        phoneBadge.classList.remove('show');
+      } else if (status === 'connecting') {
+        text.textContent = 'Connecting';
+      } else {
+        text.textContent = status === 'logged_out' ? 'Logged Out' : 'Offline';
+        phoneBadge.classList.remove('show');
+        disconnectBtn.style.display = 'none';
+        linkPanel.style.display = 'block';
+        connSection.classList.remove('show');
+      }
+    }
+
+    // ---- Fetch server URL from GitHub raw ----
+    async function fetchServerUrl() {
+      try {
+        const r = await fetch(GH_RAW_URL + '?t=' + Date.now());
+        const text = (await r.text()).trim();
+        if (text && text.startsWith('https://') && text.includes('trycloudflare')) {
+          return text;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    // ---- Connect SSE ----
+    function connectSSE(base) {
+      if (sse) { sse.close(); sse = null; }
+
+      const url = base.replace(/\/$/, '') + '/events';
+      setStatus('connecting');
+
+      sse = new EventSource(url);
+
+      sse.onopen = () => {
+        setStatus('connecting');
+      };
+
+      sse.addEventListener('status', (e) => {
+        const data = JSON.parse(e.data);
+        setStatus(data.status, data.phone);
+        if (data.qr) showQR(data.qr);
+        if (data.status === 'qr_ready' && !data.qr) fetchQR();
+      });
+
+      sse.addEventListener('message', (e) => {
+        const msg = JSON.parse(e.data);
+        addMessage(msg, true);
+      });
+
+      sse.addEventListener('history', (e) => {
+        const data = JSON.parse(e.data);
+        data.messages.reverse().forEach(m => addMessage(m, false));
+      });
+
+      sse.onerror = () => {
+        setStatus('error');
+        sse.close();
+        sse = null;
+        // Retry after 10s
+        setTimeout(() => connectSSE(base), 10000);
+      };
+    }
+
+    // ---- Fetch and connect ----
+    async function fetchAndConnect() {
+      document.getElementById('serverUrlInput').value = 'Fetching server URL...';
+      const url = await fetchServerUrl();
+      if (!url) {
+        document.getElementById('serverUrlInput').value = '';
+        document.getElementById('serverUrlInput').placeholder = 'Server offline - start GitHub Actions';
+        toast('Server is offline. Trigger GitHub Actions workflow to start it.', 'error');
+        setStatus('error');
+        return;
+      }
+      serverUrl = url;
+      document.getElementById('serverUrlInput').value = url;
+      toast('Server found. Connecting...', 'success');
+      connectSSE(url);
+    }
+
+    // ---- Show QR image ----
+    function showQR(dataUrl) {
+      const img = document.getElementById('qrImg');
+      const loading = document.getElementById('qr-loading');
+      img.src = dataUrl;
+      img.classList.add('show');
+      loading.style.display = 'none';
+    }
+
+    // ---- Fetch QR from REST ----
+    async function fetchQR() {
+      if (!serverUrl) return;
+      try {
+        const r = await fetch(serverUrl + '/qr');
+        const data = await r.json();
+        if (data.qr) showQR(data.qr);
+      } catch (e) {}
+    }
+
+    // ---- Pairing code ----
+    async function doPairing() {
+      const phone = document.getElementById('pairPhoneInput').value.trim();
+      if (!phone) { toast('Enter a phone number', 'error'); return; }
+      if (!serverUrl) { toast('Server not connected', 'error'); return; }
+
+      const btn = document.getElementById('pairBtn');
+      btn.disabled = true;
+      btn.textContent = 'Requesting...';
+
+      try {
+        const r = await fetch(serverUrl + '/pair', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const data = await r.json();
+        if (data.code) {
+          document.getElementById('pairingCode').textContent = data.code;
+          document.getElementById('pairingCodeBox').classList.add('show');
+          toast('Pairing code received. Enter it in WhatsApp.', 'success');
+        } else {
+          toast(data.error || 'Failed to get pairing code', 'error');
+        }
+      } catch (e) {
+        toast('Request failed: ' + e.message, 'error');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Get Pairing Code';
+    }
+
+    // ---- Disconnect ----
+    async function doDisconnect() {
+      if (!serverUrl) return;
+      if (!confirm('Unlink this WhatsApp account?')) return;
+
+      try {
+        await fetch(serverUrl + '/disconnect', { method: 'POST' });
+        toast('Device unlinked.', '');
+        setStatus('disconnected');
+        clearMessages();
+        if (sse) { sse.close(); sse = null; }
+      } catch (e) {
+        toast('Disconnect failed: ' + e.message, 'error');
+      }
+    }
+
+    // ---- Add message to feed ----
+    function addMessage(msg, prepend) {
+      messages.push(msg);
+      chatSet.add(msg.chatId);
+      updateStats();
+
+      const feed = document.getElementById('msgFeed');
+      const empty = document.getElementById('empty-state');
+      if (empty) empty.remove();
+
+      const card = document.createElement('div');
+      card.className = 'msg-card ' + (msg.isGroup ? 'grp-card' : 'dm-card');
+      card.id = 'msg-' + msg.id;
+
+      const avatarLetter = (msg.pushName || 'W').charAt(0).toUpperCase();
+      const typeTag = msg.isGroup
+        ? `<span class="msg-type-tag tag-grp">Group</span>`
+        : `<span class="msg-type-tag tag-dm">DM</span>`;
+
+      const groupInfo = msg.isGroup && msg.groupName
+        ? `<span class="msg-group-name">in ${escHtml(msg.groupName)}</span>`
+        : '';
+
+      const timeStr = msg.timestamp
+        ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : '';
+
+      const isMedia = msg.text.startsWith('[') && msg.text.endsWith(']');
+
+      card.innerHTML = `
+        <div class="msg-meta">
+          <div class="msg-avatar ${msg.isGroup ? 'grp' : 'dm'}">${escHtml(avatarLetter)}</div>
+          <span class="msg-sender">${escHtml(msg.pushName || 'Unknown')}</span>
+          ${typeTag}
+          ${groupInfo}
+          <span class="msg-time">${timeStr}</span>
+        </div>
+        <div class="msg-text ${isMedia ? 'media' : ''}">${escHtml(msg.text)}</div>
+      `;
+
+      if (prepend) {
+        feed.insertBefore(card, feed.firstChild);
+        feed.scrollTop = 0;
+      } else {
+        feed.appendChild(card);
+      }
+    }
+
+    function escHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function updateStats() {
+      document.getElementById('statMessages').textContent = messages.length;
+      document.getElementById('statChats').textContent = chatSet.size;
+      document.getElementById('msgCountBadge').textContent = messages.length + ' messages';
+    }
+
+    function clearMessages() {
+      messages = [];
+      chatSet = new Set();
+      updateStats();
+      const feed = document.getElementById('msgFeed');
+      feed.innerHTML = `<div id="empty-state"><div class="empty-icon">&#x1F4AC;</div><div class="empty-text">Messages cleared.<br>New messages will appear here.</div></div>`;
+    }
+
+    // ---- Auto-refresh QR every 20s if waiting ----
+    function startQRRefresh() {
+      clearInterval(qrRefreshTimer);
+      qrRefreshTimer = setInterval(() => {
+        if (currentStatus === 'qr_ready') fetchQR();
+      }, 20000);
+    }
+
+    // ---- Init ----
+    (async () => {
+      startQRRefresh();
+      await fetchAndConnect();
+
+      // Re-check server URL every 3 minutes in case of restart
+      setInterval(async () => {
+        if (currentStatus !== 'online') {
+          const url = await fetchServerUrl();
+          if (url && url !== serverUrl) {
+            serverUrl = url;
+            document.getElementById('serverUrlInput').value = url;
+            connectSSE(url);
+          }
+        }
+      }, 180000);
+    })();
+  </script>
+</body>
+</html>
