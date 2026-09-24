@@ -793,8 +793,9 @@
     const CORRECT_PIN   = '19902009';
     const PIN_LEN       = 8;
     const UNLOCK_KEY    = 'wao_unlocked_v1';
-    const GH_RAW_URL    = 'https://raw.githubusercontent.com/yasamarium/wasev/main/server_url.txt';
-    const RETRY_INTERVAL_MS = 60000; // re-check server URL every 60s when offline
+    // GitHub API -- no CDN cache unlike raw.githubusercontent.com
+    const GH_API_URL    = 'https://api.github.com/repos/yasamarium/wasev/contents/server_url.txt';
+    const RETRY_INTERVAL_MS = 10000; // re-check every 10s when offline
 
     // ======================================================================
     // PIN LOCK
@@ -938,15 +939,20 @@
     }
 
     // ======================================================================
-    // FETCH SERVER URL FROM GITHUB RAW
+    // FETCH SERVER URL via GitHub API (fresh, no CDN cache)
     // ======================================================================
     async function fetchServerUrl() {
       try {
-        const r = await fetch(GH_RAW_URL + '?nocache=' + Date.now());
+        const r = await fetch(GH_API_URL, {
+          headers: { 'Accept': 'application/vnd.github.v3+json' },
+          cache: 'no-store'
+        });
         if (!r.ok) return null;
-        const txt = (await r.text()).trim();
-        // Accept any https URL (trycloudflare or others)
-        if (txt && txt.startsWith('https://') && txt.length > 15) {
+        const d = await r.json();
+        if (!d.content) return null;
+        // Content is base64 encoded
+        const txt = atob(d.content.replace(/\n/g, '')).trim();
+        if (txt && txt.startsWith('https://') && txt.length > 20) {
           return txt;
         }
       } catch (e) {}
@@ -1178,7 +1184,7 @@
             connectSSE(url);
           }
         }
-      }, 180000);
+      }, 30000);
     }
 
     // ======================================================================
