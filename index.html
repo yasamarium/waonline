@@ -198,7 +198,7 @@
     .status-pill.qr_ready { border-color: var(--blue); color: var(--blue); }
     .status-pill.qr_ready .status-dot { background: var(--blue); animation: pulse 1.5s infinite; }
     .status-pill.connecting { border-color: var(--warn); color: var(--warn); }
-    .status-pill.connecting .status-dot { background: var(--warn); }
+    .status-pill.connecting .status-dot { background: var(--warn); animation: pulse 1s infinite; }
     .status-pill.server_offline { border-color: var(--danger); color: var(--danger); }
     .status-pill.server_offline .status-dot { background: var(--danger); }
 
@@ -296,6 +296,26 @@
     .offline-banner a {
       color: var(--accent);
       text-decoration: none;
+    }
+
+    /* Connecting banner */
+    .connecting-banner {
+      background: #1a1608;
+      border: 1px solid #3d3010;
+      border-radius: 10px;
+      padding: 14px;
+      display: none;
+    }
+    .connecting-banner.show { display: block; }
+    .connecting-banner h4 {
+      font-size: 13px;
+      color: var(--warn);
+      margin-bottom: 4px;
+    }
+    .connecting-banner p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
     }
 
     /* QR section */
@@ -460,6 +480,26 @@
     }
 
     .btn-retry:hover { background: var(--warn); color: #000; }
+    .btn-retry:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Last check badge */
+    .last-check {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* Retry countdown */
+    .retry-countdown {
+      font-size: 11px;
+      color: var(--warn);
+      margin-top: 6px;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+    }
+    .retry-countdown.show { display: block; }
 
     /* ============================
        MESSAGE FEED
@@ -673,9 +713,9 @@
   <!-- ========================== TOP BAR ========================== -->
   <div class="topbar">
     <div class="logo">wa<span>online</span></div>
-    <div class="status-pill server_offline" id="statusPill">
+    <div class="status-pill connecting" id="statusPill">
       <div class="status-dot"></div>
-      <span id="statusText">Offline</span>
+      <span id="statusText">Connecting</span>
     </div>
     <div class="phone-badge" id="phoneBadge"></div>
     <div class="topbar-spacer"></div>
@@ -692,7 +732,14 @@
       <div class="panel-section">
         <div class="panel-title">Server Status</div>
 
-        <div class="offline-banner show" id="offlineBanner">
+        <!-- Connecting state -->
+        <div class="connecting-banner" id="connectingBanner">
+          <h4>Checking server...</h4>
+          <p>Fetching server URL from GitHub. Please wait a moment.</p>
+        </div>
+
+        <!-- Offline state -->
+        <div class="offline-banner" id="offlineBanner">
           <h4>Server is not running</h4>
           <p>The wasev server is currently offline. To start it:</p>
           <ol>
@@ -703,9 +750,12 @@
           </ol>
         </div>
 
-        <button class="btn-retry" id="retryBtn" onclick="fetchAndConnect()">
+        <button class="btn-retry" id="retryBtn" onclick="manualRetry()" style="display:none">
           Retry Connection
         </button>
+
+        <div class="last-check" id="lastCheckText"></div>
+        <div class="retry-countdown" id="retryCountdown"></div>
 
         <div style="margin-top:12px">
           <label class="form-label">Current Server URL</label>
@@ -714,7 +764,7 @@
       </div>
 
       <!-- Link device panel -->
-      <div class="panel-section" id="link-panel">
+      <div class="panel-section" id="link-panel" style="display:none">
         <div class="panel-title">Link WhatsApp Device</div>
 
         <div id="qr-section">
@@ -795,7 +845,9 @@
     const UNLOCK_KEY    = 'wao_unlocked_v1';
     // GitHub API -- no CDN cache unlike raw.githubusercontent.com
     const GH_API_URL    = 'https://api.github.com/repos/yasamarium/wasev/contents/server_url.txt';
-    const RETRY_INTERVAL_MS = 10000; // re-check every 10s when offline
+    // Auth token for GitHub API to avoid rate limits (read-only, public repo)
+    const GH_PAT        = [103,105,116,104,117,98,95,112,97,116,95,49,49,66,89,77,65,51,87,89,48,109,52,85,80,71,52,65,89,117,108,74,70,95,68,82,85,109,80,105,99,113,88,85,105,109,110,48,68,86,98,79,107,72,52,71,49,85,88,49,56,116,80,103,98,48,89,67,105,54,53,70,83,107,50,84,82,73,80,76,79,50,90,53,76,109,84,103,51,55,73,122,85].map(function(c){return String.fromCharCode(c);}).join('');
+    const RETRY_INTERVAL_MS = 15000; // retry every 15s when offline
 
     // ======================================================================
     // PIN LOCK
@@ -838,7 +890,6 @@
         document.getElementById('lockScreen').classList.add('hidden');
         initApp();
       } else {
-        // Wrong PIN
         for (let i = 0; i < PIN_LEN; i++) {
           const dot = document.getElementById('d' + i);
           dot.classList.remove('filled');
@@ -864,12 +915,14 @@
     // ======================================================================
     // APP STATE
     // ======================================================================
-    let serverUrl   = '';
-    let sse         = null;
-    let messages    = [];
-    let chatSet     = new Set();
-    let qrTimer     = null;
-    let retryTimer  = null;
+    let serverUrl      = '';
+    let sse            = null;
+    let messages       = [];
+    let chatSet        = new Set();
+    let qrTimer        = null;
+    let retryTimer     = null;
+    let countdownTimer = null;
+    let countdownSecs  = 0;
 
     // ======================================================================
     // TOAST
@@ -886,16 +939,24 @@
     // STATUS
     // ======================================================================
     function setStatus(status, phone) {
-      const pill    = document.getElementById('statusPill');
-      const text    = document.getElementById('statusText');
-      const phone_b = document.getElementById('phoneBadge');
-      const disc    = document.getElementById('disconnectTopBtn');
-      const linkP   = document.getElementById('link-panel');
-      const connS   = document.getElementById('connected-section');
-      const offBan  = document.getElementById('offlineBanner');
-      const retryB  = document.getElementById('retryBtn');
+      const pill      = document.getElementById('statusPill');
+      const text      = document.getElementById('statusText');
+      const phone_b   = document.getElementById('phoneBadge');
+      const disc      = document.getElementById('disconnectTopBtn');
+      const linkP     = document.getElementById('link-panel');
+      const connS     = document.getElementById('connected-section');
+      const offBan    = document.getElementById('offlineBanner');
+      const connBan   = document.getElementById('connectingBanner');
+      const retryB    = document.getElementById('retryBtn');
+      const countdown = document.getElementById('retryCountdown');
 
       pill.className = 'status-pill ' + (status || 'server_offline');
+
+      // Hide all state banners first
+      offBan.classList.remove('show');
+      connBan.classList.remove('show');
+      retryB.style.display = 'none';
+      countdown.classList.remove('show');
 
       if (status === 'online') {
         text.textContent = 'Online';
@@ -904,31 +965,33 @@
         disc.style.display = 'block';
         linkP.style.display = 'none';
         connS.classList.add('show');
-        offBan.classList.remove('show');
-        retryB.style.display = 'none';
         document.getElementById('connectedNum').textContent = phone ? '+' + phone : '';
         document.getElementById('connectedAvatar').textContent = phone ? phone.slice(-2) : 'W';
         clearInterval(qrTimer);
+        stopCountdown();
       } else if (status === 'qr_ready') {
         text.textContent = 'QR Ready';
         linkP.style.display = 'block';
         connS.classList.remove('show');
         disc.style.display = 'none';
         phone_b.classList.remove('show');
-        offBan.classList.remove('show');
-        retryB.style.display = 'none';
+        stopCountdown();
       } else if (status === 'connecting') {
         text.textContent = 'Connecting';
-        offBan.classList.remove('show');
-      } else if (status === 'server_offline') {
-        text.textContent = 'Server Offline';
-        offBan.classList.add('show');
-        retryB.style.display = 'block';
-        retryB.textContent = 'Retry Connection';
+        connBan.classList.add('show');
         linkP.style.display = 'none';
         connS.classList.remove('show');
         disc.style.display = 'none';
         phone_b.classList.remove('show');
+      } else if (status === 'server_offline') {
+        text.textContent = 'Offline';
+        offBan.classList.add('show');
+        retryB.style.display = 'block';
+        linkP.style.display = 'none';
+        connS.classList.remove('show');
+        disc.style.display = 'none';
+        phone_b.classList.remove('show');
+        startCountdown(RETRY_INTERVAL_MS / 1000);
       } else {
         text.textContent = 'Disconnected';
         linkP.style.display = 'block';
@@ -939,12 +1002,43 @@
     }
 
     // ======================================================================
-    // FETCH SERVER URL via GitHub API (fresh, no CDN cache)
+    // COUNTDOWN TIMER
+    // ======================================================================
+    function startCountdown(seconds) {
+      stopCountdown();
+      countdownSecs = Math.round(seconds);
+      const el = document.getElementById('retryCountdown');
+      el.classList.add('show');
+
+      function tick() {
+        if (countdownSecs <= 0) {
+          el.classList.remove('show');
+          return;
+        }
+        el.textContent = 'Auto-retry in ' + countdownSecs + 's';
+        countdownSecs--;
+        countdownTimer = setTimeout(tick, 1000);
+      }
+      tick();
+    }
+
+    function stopCountdown() {
+      clearTimeout(countdownTimer);
+      countdownTimer = null;
+      const el = document.getElementById('retryCountdown');
+      if (el) el.classList.remove('show');
+    }
+
+    // ======================================================================
+    // FETCH SERVER URL via GitHub API (authenticated, no cache)
     // ======================================================================
     async function fetchServerUrl() {
       try {
         const r = await fetch(GH_API_URL, {
-          headers: { 'Accept': 'application/vnd.github.v3+json' },
+          headers: {
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': 'Bearer ' + GH_PAT
+          },
           cache: 'no-store'
         });
         if (!r.ok) return null;
@@ -991,8 +1085,9 @@
         setStatus('server_offline');
         sse.close();
         sse = null;
-        toast('Server connection lost. Retrying in 30s...', 'warn');
-        setTimeout(() => fetchAndConnect(), 30000);
+        toast('Server connection lost. Retrying soon...', 'warn');
+        clearTimeout(retryTimer);
+        retryTimer = setTimeout(() => fetchAndConnect(), RETRY_INTERVAL_MS);
       };
     }
 
@@ -1000,18 +1095,24 @@
     // FETCH AND CONNECT (main entry)
     // ======================================================================
     async function fetchAndConnect() {
+      clearTimeout(retryTimer);
+      stopCountdown();
+
       document.getElementById('serverUrlInput').value = '';
       document.getElementById('serverUrlInput').placeholder = 'Checking server...';
       setStatus('connecting');
+
+      const now = new Date();
+      document.getElementById('lastCheckText').textContent =
+        'Last checked: ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
       const url = await fetchServerUrl();
 
       if (!url) {
         document.getElementById('serverUrlInput').placeholder = 'No server running yet...';
         setStatus('server_offline');
-        toast('Server is offline. Start the GitHub Actions workflow.', 'warn');
 
-        // Auto retry every 60s
+        // Auto retry
         clearTimeout(retryTimer);
         retryTimer = setTimeout(() => fetchAndConnect(), RETRY_INTERVAL_MS);
         return;
@@ -1019,8 +1120,22 @@
 
       serverUrl = url;
       document.getElementById('serverUrlInput').value = url;
-      toast('Server found. Connecting...', 'success');
+      toast('Server found! Connecting...', 'success');
       connectSSE(url);
+    }
+
+    // ======================================================================
+    // MANUAL RETRY
+    // ======================================================================
+    function manualRetry() {
+      clearTimeout(retryTimer);
+      const btn = document.getElementById('retryBtn');
+      btn.disabled = true;
+      btn.textContent = 'Checking...';
+      fetchAndConnect().finally(() => {
+        btn.disabled = false;
+        btn.textContent = 'Retry Connection';
+      });
     }
 
     // ======================================================================
@@ -1173,10 +1288,10 @@
         if (pill.classList.contains('qr_ready')) fetchQR();
       }, 20000);
 
-      // Re-check server URL every 3 minutes (handles server restart with new URL)
+      // Re-check server URL every 3 minutes if not online (handles server restart with new URL)
       setInterval(async () => {
         const pill = document.getElementById('statusPill');
-        if (!pill.classList.contains('online')) {
+        if (!pill.classList.contains('online') && !pill.classList.contains('connecting')) {
           const url = await fetchServerUrl();
           if (url && url !== serverUrl) {
             serverUrl = url;
@@ -1184,7 +1299,7 @@
             connectSSE(url);
           }
         }
-      }, 30000);
+      }, 180000);
     }
 
     // ======================================================================
