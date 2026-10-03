@@ -19,8 +19,6 @@
       --danger: #ef4444;
       --warn: #f59e0b;
       --blue: #3b82f6;
-      --nv-green: #76b900;
-      --nv-dark: #1a1a2e;
       --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
@@ -163,25 +161,6 @@
       z-index: 100;
     }
 
-    .nav-btn {
-      font-size: 12px;
-      font-weight: 700;
-      padding: 6px 14px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: var(--font);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .nav-btn:hover { border-color: var(--nv-green); color: var(--nv-green); }
-    .nav-btn.active { background: var(--nv-green); color: #000; border-color: var(--nv-green); }
-    .nav-btn.active-wa { background: var(--accent); color: #fff; border-color: var(--accent); }
-
     .logo {
       font-size: 18px;
       font-weight: 700;
@@ -248,13 +227,7 @@
     .btn-sm:hover { border-color: var(--danger); color: var(--danger); }
 
     /* ============================
-       PAGE VIEWS
-       ============================ */
-    .page-view { display: none; flex: 1; overflow: hidden; }
-    .page-view.active { display: flex; }
-
-    /* ============================
-       LAYOUT (WA page)
+       LAYOUT
        ============================ */
     .layout {
       display: flex;
@@ -262,6 +235,9 @@
       overflow: hidden;
     }
 
+    /* ============================
+       LEFT PANEL
+       ============================ */
     .left-panel {
       width: 340px;
       border-right: 1px solid var(--border);
@@ -286,6 +262,7 @@
       font-weight: 700;
     }
 
+    /* Server offline banner */
     .offline-banner {
       background: #1a1010;
       border: 1px solid #3d1a1a;
@@ -321,6 +298,7 @@
       text-decoration: none;
     }
 
+    /* Connecting banner */
     .connecting-banner {
       background: #1a1608;
       border: 1px solid #3d3010;
@@ -329,9 +307,18 @@
       display: none;
     }
     .connecting-banner.show { display: block; }
-    .connecting-banner h4 { font-size: 13px; color: var(--warn); margin-bottom: 4px; }
-    .connecting-banner p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .connecting-banner h4 {
+      font-size: 13px;
+      color: var(--warn);
+      margin-bottom: 4px;
+    }
+    .connecting-banner p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
 
+    /* QR section */
     #qr-section { text-align: center; }
 
     #qrImg {
@@ -345,6 +332,7 @@
     }
 
     #qrImg.show { display: block; }
+
     .qr-hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
     .or-divider {
@@ -475,6 +463,7 @@
     .stat-num { font-size: 22px; font-weight: 700; color: var(--accent); }
     .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
+    /* Retry button */
     .btn-retry {
       width: 100%;
       padding: 10px;
@@ -493,10 +482,28 @@
     .btn-retry:hover { background: var(--warn); color: #000; }
     .btn-retry:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .last-check { font-size: 11px; color: var(--muted); margin-top: 8px; text-align: center; }
-    .retry-countdown { font-size: 11px; color: var(--warn); margin-top: 6px; text-align: center; font-weight: 600; display: none; }
+    /* Last check badge */
+    .last-check {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* Retry countdown */
+    .retry-countdown {
+      font-size: 11px;
+      color: var(--warn);
+      margin-top: 6px;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+    }
     .retry-countdown.show { display: block; }
 
+    /* ============================
+       MESSAGE FEED
+       ============================ */
     .right-panel {
       flex: 1;
       display: flex;
@@ -629,224 +636,6 @@
 
     .msg-text.media { color: var(--muted); font-style: italic; }
 
-    /* ============================
-       NIM AI PAGE
-       ============================ */
-    .nim-page {
-      flex-direction: column;
-      background: var(--bg);
-    }
-
-    .nim-topstrip {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .nim-logo {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--nv-green);
-      letter-spacing: 1px;
-    }
-
-    .nim-logo span { color: var(--muted); font-weight: 400; font-size: 12px; }
-
-    .nim-model-select {
-      padding: 6px 12px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 13px;
-      font-family: var(--font);
-      outline: none;
-      cursor: pointer;
-      min-width: 260px;
-      max-width: 400px;
-    }
-
-    .nim-model-select:focus { border-color: var(--nv-green); }
-
-    .nim-model-count {
-      font-size: 11px;
-      color: var(--muted);
-      background: var(--card);
-      border: 1px solid var(--border);
-      padding: 3px 10px;
-      border-radius: 99px;
-    }
-
-    .nim-clear-btn {
-      font-size: 11px;
-      padding: 5px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all 0.2s;
-      margin-left: auto;
-    }
-    .nim-clear-btn:hover { color: var(--danger); border-color: var(--danger); }
-
-    .nim-chat-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .nim-chat-area::-webkit-scrollbar { width: 5px; }
-    .nim-chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
-
-    .nim-msg {
-      max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 16px;
-      font-size: 14px;
-      line-height: 1.6;
-      word-break: break-word;
-      white-space: pre-wrap;
-      animation: slideIn 0.2s ease;
-    }
-
-    .nim-msg.user {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #1a3a2a, #1e3020);
-      border: 1px solid #2a5530;
-      color: var(--text);
-      border-bottom-right-radius: 4px;
-    }
-
-    .nim-msg.assistant {
-      align-self: flex-start;
-      background: var(--card);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-bottom-left-radius: 4px;
-    }
-
-    .nim-msg.assistant .nim-msg-model {
-      font-size: 10px;
-      color: var(--nv-green);
-      font-weight: 700;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .nim-msg.system-msg {
-      align-self: center;
-      background: transparent;
-      border: 1px dashed var(--border);
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-      max-width: 60%;
-    }
-
-    .nim-msg .thinking-dots::after {
-      content: '';
-      animation: dots 1.5s steps(4, end) infinite;
-    }
-
-    @keyframes dots {
-      0% { content: ''; }
-      25% { content: '.'; }
-      50% { content: '..'; }
-      75% { content: '...'; }
-    }
-
-    .nim-empty {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      color: var(--muted);
-    }
-
-    .nim-empty-icon {
-      font-size: 56px;
-      opacity: 0.15;
-      font-weight: 900;
-      color: var(--nv-green);
-    }
-
-    .nim-empty-text { font-size: 14px; text-align: center; line-height: 1.6; }
-
-    .nim-input-area {
-      padding: 16px 20px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-      flex-shrink: 0;
-    }
-
-    .nim-input {
-      flex: 1;
-      padding: 12px 16px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      font-size: 14px;
-      font-family: var(--font);
-      outline: none;
-      resize: none;
-      max-height: 150px;
-      min-height: 44px;
-      line-height: 1.4;
-      transition: border 0.2s;
-    }
-
-    .nim-input:focus { border-color: var(--nv-green); }
-    .nim-input::placeholder { color: var(--muted); }
-
-    .nim-send-btn {
-      padding: 10px 20px;
-      background: var(--nv-green);
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .nim-send-btn:hover { opacity: 0.85; }
-    .nim-send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    .nim-stop-btn {
-      padding: 10px 20px;
-      background: var(--danger);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .nim-stop-btn:hover { opacity: 0.85; }
-
     /* Toast */
     .toast-container {
       position: fixed;
@@ -882,9 +671,6 @@
       .left-panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
       .layout { flex-direction: column; }
       .right-panel { min-height: 50vh; }
-      .nim-msg { max-width: 92%; }
-      .nim-model-select { min-width: 140px; }
-      .nim-topstrip { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -926,8 +712,6 @@
 
   <!-- ========================== TOP BAR ========================== -->
   <div class="topbar">
-    <button class="nav-btn" id="navNimBtn" onclick="switchPage('nim')">NIM AI</button>
-    <button class="nav-btn active-wa" id="navWaBtn" onclick="switchPage('wa')">WhatsApp</button>
     <div class="logo">wa<span>online</span></div>
     <div class="status-pill connecting" id="statusPill">
       <div class="status-dot"></div>
@@ -938,139 +722,114 @@
     <button class="btn-sm" id="disconnectTopBtn" style="display:none" onclick="doDisconnect()">Disconnect</button>
   </div>
 
-  <!-- ========================== WA PAGE ========================== -->
-  <div class="page-view active" id="pageWa">
-    <div class="layout">
+  <!-- ========================== MAIN LAYOUT ========================== -->
+  <div class="layout">
 
-      <!-- Left Panel -->
-      <div class="left-panel">
+    <!-- Left Panel -->
+    <div class="left-panel">
 
-        <div class="panel-section">
-          <div class="panel-title">Server Status</div>
+      <!-- Server status panel -->
+      <div class="panel-section">
+        <div class="panel-title">Server Status</div>
 
-          <div class="connecting-banner" id="connectingBanner">
-            <h4>Checking server...</h4>
-            <p>Fetching server URL from GitHub. Please wait a moment.</p>
-          </div>
-
-          <div class="offline-banner" id="offlineBanner">
-            <h4>Server is not running</h4>
-            <p>The wasev server is currently offline. To start it:</p>
-            <ol>
-              <li>Go to <a href="https://github.com/yasamarium/wasev/actions" target="_blank">wasev Actions</a></li>
-              <li>Click "WhatsApp Server Auto-Runner"</li>
-              <li>Click "Run workflow" button</li>
-              <li>Wait ~30 seconds, then click Retry below</li>
-            </ol>
-          </div>
-
-          <button class="btn-retry" id="retryBtn" onclick="manualRetry()" style="display:none">
-            Retry Connection
-          </button>
-
-          <div class="last-check" id="lastCheckText"></div>
-          <div class="retry-countdown" id="retryCountdown"></div>
-
-          <div style="margin-top:12px">
-            <label class="form-label">Current Server URL</label>
-            <input type="text" class="form-input" id="serverUrlInput" readonly placeholder="No server running yet..." style="font-size:11px;color:var(--muted);" />
-          </div>
+        <!-- Connecting state -->
+        <div class="connecting-banner" id="connectingBanner">
+          <h4>Checking server...</h4>
+          <p>Fetching server URL from GitHub. Please wait a moment.</p>
         </div>
 
-        <div class="panel-section" id="link-panel" style="display:none">
-          <div class="panel-title">Link WhatsApp Device</div>
-
-          <div id="qr-section">
-            <img id="qrImg" alt="WhatsApp QR Code" />
-            <div id="qr-loading" class="qr-hint">Waiting for QR code from server...</div>
-            <p class="qr-hint" style="margin-top:8px">
-              WhatsApp &gt; Linked Devices &gt; Link a Device &gt; Scan QR
-            </p>
-          </div>
-
-          <div class="or-divider"><span>or use pairing code</span></div>
-
-          <div class="form-group">
-            <label class="form-label">Phone number (with country code, no spaces)</label>
-            <input type="tel" class="form-input" id="pairPhoneInput" placeholder="+919876543210" />
-          </div>
-          <button class="btn-primary" id="pairBtn" onclick="doPairing()">Get Pairing Code</button>
-
-          <div id="pairingCodeBox">
-            <div id="pairingCode">--------</div>
-            <div class="pairing-hint">Enter this code: WhatsApp &gt; Linked Devices &gt; Link with phone number</div>
-          </div>
+        <!-- Offline state -->
+        <div class="offline-banner" id="offlineBanner">
+          <h4>Server is not running</h4>
+          <p>The wasev server is currently offline. To start it:</p>
+          <ol>
+            <li>Go to <a href="https://github.com/yasamarium/wasev/actions" target="_blank">wasev Actions</a></li>
+            <li>Click "WhatsApp Server Auto-Runner"</li>
+            <li>Click "Run workflow" button</li>
+            <li>Wait ~30 seconds, then click Retry below</li>
+          </ol>
         </div>
 
-        <div class="panel-section" id="connected-section">
-          <div class="panel-title">Connected Account</div>
-          <div class="connected-avatar" id="connectedAvatar">W</div>
-          <div class="connected-name">WhatsApp Online</div>
-          <div class="connected-num" id="connectedNum">+--</div>
-          <button class="btn-danger" onclick="doDisconnect()">Unlink Device</button>
-        </div>
+        <button class="btn-retry" id="retryBtn" onclick="manualRetry()" style="display:none">
+          Retry Connection
+        </button>
 
-        <div class="panel-section">
-          <div class="panel-title">Session Stats</div>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-num" id="statMessages">0</div>
-              <div class="stat-label">Messages</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-num" id="statChats">0</div>
-              <div class="stat-label">Chats</div>
-            </div>
-          </div>
-        </div>
+        <div class="last-check" id="lastCheckText"></div>
+        <div class="retry-countdown" id="retryCountdown"></div>
 
+        <div style="margin-top:12px">
+          <label class="form-label">Current Server URL</label>
+          <input type="text" class="form-input" id="serverUrlInput" readonly placeholder="No server running yet..." style="font-size:11px;color:var(--muted);" />
+        </div>
       </div>
 
-      <!-- Right Panel - Message Feed -->
-      <div class="right-panel">
-        <div class="feed-header">
-          <div class="feed-title">Live Message Feed</div>
-          <div class="msg-count-badge" id="msgCountBadge">0 messages</div>
-          <div class="feed-spacer"></div>
-          <button class="clear-btn" onclick="clearMessages()">Clear</button>
+      <!-- Link device panel -->
+      <div class="panel-section" id="link-panel" style="display:none">
+        <div class="panel-title">Link WhatsApp Device</div>
+
+        <div id="qr-section">
+          <img id="qrImg" alt="WhatsApp QR Code" />
+          <div id="qr-loading" class="qr-hint">Waiting for QR code from server...</div>
+          <p class="qr-hint" style="margin-top:8px">
+            WhatsApp &gt; Linked Devices &gt; Link a Device &gt; Scan QR
+          </p>
         </div>
 
-        <div class="msg-feed" id="msgFeed">
-          <div id="empty-state">
-            <div class="empty-icon">&#x1F4AC;</div>
-            <div class="empty-text">No messages yet.<br>Start the server and link your WhatsApp account.</div>
+        <div class="or-divider"><span>or use pairing code</span></div>
+
+        <div class="form-group">
+          <label class="form-label">Phone number (with country code, no spaces)</label>
+          <input type="tel" class="form-input" id="pairPhoneInput" placeholder="+919876543210" />
+        </div>
+        <button class="btn-primary" id="pairBtn" onclick="doPairing()">Get Pairing Code</button>
+
+        <div id="pairingCodeBox">
+          <div id="pairingCode">--------</div>
+          <div class="pairing-hint">Enter this code: WhatsApp &gt; Linked Devices &gt; Link with phone number</div>
+        </div>
+      </div>
+
+      <!-- Connected panel -->
+      <div class="panel-section" id="connected-section">
+        <div class="panel-title">Connected Account</div>
+        <div class="connected-avatar" id="connectedAvatar">W</div>
+        <div class="connected-name">WhatsApp Online</div>
+        <div class="connected-num" id="connectedNum">+--</div>
+        <button class="btn-danger" onclick="doDisconnect()">Unlink Device</button>
+      </div>
+
+      <!-- Stats panel -->
+      <div class="panel-section">
+        <div class="panel-title">Session Stats</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="statMessages">0</div>
+            <div class="stat-label">Messages</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="statChats">0</div>
+            <div class="stat-label">Chats</div>
           </div>
         </div>
       </div>
 
     </div>
-  </div>
 
-  <!-- ========================== NIM AI PAGE ========================== -->
-  <div class="page-view nim-page" id="pageNim">
+    <!-- Right Panel - Message Feed -->
+    <div class="right-panel">
+      <div class="feed-header">
+        <div class="feed-title">Live Message Feed</div>
+        <div class="msg-count-badge" id="msgCountBadge">0 messages</div>
+        <div class="feed-spacer"></div>
+        <button class="clear-btn" onclick="clearMessages()">Clear</button>
+      </div>
 
-    <div class="nim-topstrip">
-      <div class="nim-logo">NVIDIA NIM <span>API</span></div>
-      <select class="nim-model-select" id="nimModelSelect">
-        <option value="">Loading models...</option>
-      </select>
-      <div class="nim-model-count" id="nimModelCount">--</div>
-      <button class="nim-clear-btn" onclick="nimClearChat()">Clear Chat</button>
-    </div>
-
-    <div class="nim-chat-area" id="nimChatArea">
-      <div class="nim-empty" id="nimEmptyState">
-        <div class="nim-empty-icon">NIM</div>
-        <div class="nim-empty-text">
-          Select a model and start chatting.<br>
-          81 models available via NVIDIA NIM API.
+      <div class="msg-feed" id="msgFeed">
+        <div id="empty-state">
+          <div class="empty-icon">&#x1F4AC;</div>
+          <div class="empty-text">No messages yet.<br>Start the server and link your WhatsApp account.</div>
         </div>
       </div>
-    </div>
-
-    <div class="nim-input-area">
-      <textarea class="nim-input" id="nimInput" placeholder="Type your message..." rows="1" onkeydown="nimInputKeydown(event)"></textarea>
-      <button class="nim-send-btn" id="nimSendBtn" onclick="nimSend()">Send</button>
     </div>
 
   </div>
@@ -1084,32 +843,11 @@
     const CORRECT_PIN   = '19902009';
     const PIN_LEN       = 8;
     const UNLOCK_KEY    = 'wao_unlocked_v1';
+    // GitHub API -- no CDN cache unlike raw.githubusercontent.com
     const GH_API_URL    = 'https://api.github.com/repos/yasamarium/wasev/contents/server_url.txt';
+    // Auth token for GitHub API to avoid rate limits (read-only, public repo)
     const GH_PAT        = [103,105,116,104,117,98,95,112,97,116,95,49,49,66,89,77,65,51,87,89,48,109,52,85,80,71,52,65,89,117,108,74,70,95,68,82,85,109,80,105,99,113,88,85,105,109,110,48,68,86,98,79,107,72,52,71,49,85,88,49,56,116,80,103,98,48,89,67,105,54,53,70,83,107,50,84,82,73,80,76,79,50,90,53,76,109,84,103,51,55,73,122,85].map(function(c){return String.fromCharCode(c);}).join('');
-    const RETRY_INTERVAL_MS = 15000;
-
-    // NVIDIA NIM API Key (encrypted as char-code array)
-    const NV_API_KEY = [110,118,97,112,105,45,108,100,105,115,88,54,90,95,49,115,98,83,89,66,69,109,53,81,102,50,65,74,72,105,54,73,72,69,54,45,86,50,55,50,54,66,69,87,89,81,106,72,107,49,113,72,82,89,77,49,112,67,74,80,69,66,73,54,71,48,119,116,77,53].map(function(c){return String.fromCharCode(c);}).join('');
-    const NV_BASE_URL = 'https://integrate.api.nvidia.com/v1';
-
-    // ======================================================================
-    // PAGE NAVIGATION
-    // ======================================================================
-    let currentPage = 'wa';
-
-    function switchPage(page) {
-      currentPage = page;
-      document.getElementById('pageWa').classList.toggle('active', page === 'wa');
-      document.getElementById('pageNim').classList.toggle('active', page === 'nim');
-      document.getElementById('navWaBtn').classList.toggle('active-wa', page === 'wa');
-      document.getElementById('navWaBtn').classList.remove('active');
-      document.getElementById('navNimBtn').classList.toggle('active', page === 'nim');
-      document.getElementById('navNimBtn').classList.remove('active-wa');
-
-      if (page === 'nim' && !nimModelsLoaded) {
-        nimLoadModels();
-      }
-    }
+    const RETRY_INTERVAL_MS = 15000; // retry every 15s when offline
 
     // ======================================================================
     // PIN LOCK
@@ -1166,6 +904,7 @@
       }
     }
 
+    // Keyboard support for PIN
     document.addEventListener('keydown', (e) => {
       const ls = document.getElementById('lockScreen');
       if (ls.classList.contains('hidden')) return;
@@ -1174,7 +913,7 @@
     });
 
     // ======================================================================
-    // WA APP STATE
+    // APP STATE
     // ======================================================================
     let serverUrl      = '';
     let sse            = null;
@@ -1213,6 +952,7 @@
 
       pill.className = 'status-pill ' + (status || 'server_offline');
 
+      // Hide all state banners first
       offBan.classList.remove('show');
       connBan.classList.remove('show');
       retryB.style.display = 'none';
@@ -1262,15 +1002,19 @@
     }
 
     // ======================================================================
-    // COUNTDOWN
+    // COUNTDOWN TIMER
     // ======================================================================
     function startCountdown(seconds) {
       stopCountdown();
       countdownSecs = Math.round(seconds);
       const el = document.getElementById('retryCountdown');
       el.classList.add('show');
+
       function tick() {
-        if (countdownSecs <= 0) { el.classList.remove('show'); return; }
+        if (countdownSecs <= 0) {
+          el.classList.remove('show');
+          return;
+        }
         el.textContent = 'Auto-retry in ' + countdownSecs + 's';
         countdownSecs--;
         countdownTimer = setTimeout(tick, 1000);
@@ -1286,43 +1030,57 @@
     }
 
     // ======================================================================
-    // FETCH SERVER URL
+    // FETCH SERVER URL via GitHub API (authenticated, no cache)
     // ======================================================================
     async function fetchServerUrl() {
       try {
         const r = await fetch(GH_API_URL, {
-          headers: { 'Accept': 'application/vnd.github.v3+json', 'Authorization': 'Bearer ' + GH_PAT },
+          headers: {
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': 'Bearer ' + GH_PAT
+          },
           cache: 'no-store'
         });
         if (!r.ok) return null;
         const d = await r.json();
         if (!d.content) return null;
+        // Content is base64 encoded
         const txt = atob(d.content.replace(/\n/g, '')).trim();
-        if (txt && txt.startsWith('https://') && txt.length > 20) return txt;
+        if (txt && txt.startsWith('https://') && txt.length > 20) {
+          return txt;
+        }
       } catch (e) {}
       return null;
     }
 
     // ======================================================================
-    // SSE
+    // CONNECT SSE
     // ======================================================================
     function connectSSE(base) {
       if (sse) { sse.close(); sse = null; }
       setStatus('connecting');
+
       const url = base.replace(/\/$/, '') + '/events';
       sse = new EventSource(url);
+
       sse.onopen = () => setStatus('connecting');
+
       sse.addEventListener('status', (e) => {
         const d = JSON.parse(e.data);
         setStatus(d.status, d.phone);
         if (d.qr) showQR(d.qr);
         if (d.status === 'qr_ready' && !d.qr) fetchQR();
       });
-      sse.addEventListener('message', (e) => { addMessage(JSON.parse(e.data), true); });
+
+      sse.addEventListener('message', (e) => {
+        addMessage(JSON.parse(e.data), true);
+      });
+
       sse.addEventListener('history', (e) => {
         const d = JSON.parse(e.data);
         [...d.messages].reverse().forEach(m => addMessage(m, false));
       });
+
       sse.onerror = () => {
         setStatus('server_offline');
         sse.close();
@@ -1334,44 +1092,57 @@
     }
 
     // ======================================================================
-    // FETCH AND CONNECT
+    // FETCH AND CONNECT (main entry)
     // ======================================================================
     async function fetchAndConnect() {
       clearTimeout(retryTimer);
       stopCountdown();
+
       document.getElementById('serverUrlInput').value = '';
       document.getElementById('serverUrlInput').placeholder = 'Checking server...';
       setStatus('connecting');
+
       const now = new Date();
       document.getElementById('lastCheckText').textContent =
         'Last checked: ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
       const url = await fetchServerUrl();
+
       if (!url) {
         document.getElementById('serverUrlInput').placeholder = 'No server running yet...';
         setStatus('server_offline');
+
+        // Auto retry
         clearTimeout(retryTimer);
         retryTimer = setTimeout(() => fetchAndConnect(), RETRY_INTERVAL_MS);
         return;
       }
+
       serverUrl = url;
       document.getElementById('serverUrlInput').value = url;
       toast('Server found! Connecting...', 'success');
       connectSSE(url);
     }
 
+    // ======================================================================
+    // MANUAL RETRY
+    // ======================================================================
     function manualRetry() {
       clearTimeout(retryTimer);
       const btn = document.getElementById('retryBtn');
       btn.disabled = true;
       btn.textContent = 'Checking...';
-      fetchAndConnect().finally(() => { btn.disabled = false; btn.textContent = 'Retry Connection'; });
+      fetchAndConnect().finally(() => {
+        btn.disabled = false;
+        btn.textContent = 'Retry Connection';
+      });
     }
 
     // ======================================================================
-    // QR / PAIRING / DISCONNECT
+    // QR CODE
     // ======================================================================
     function showQR(dataUrl) {
-      const img = document.getElementById('qrImg');
+      const img     = document.getElementById('qrImg');
       const loading = document.getElementById('qr-loading');
       img.src = dataUrl;
       img.classList.add('show');
@@ -1380,29 +1151,62 @@
 
     async function fetchQR() {
       if (!serverUrl) return;
-      try { const r = await fetch(serverUrl + '/qr'); const d = await r.json(); if (d.qr) showQR(d.qr); } catch (e) {}
+      try {
+        const r = await fetch(serverUrl + '/qr');
+        const d = await r.json();
+        if (d.qr) showQR(d.qr);
+      } catch (e) {}
     }
 
+    // ======================================================================
+    // PAIRING CODE
+    // ======================================================================
     async function doPairing() {
       const phone = document.getElementById('pairPhoneInput').value.trim();
       if (!phone) { toast('Enter a phone number', 'error'); return; }
       if (!serverUrl) { toast('Server is not connected', 'error'); return; }
+
       const btn = document.getElementById('pairBtn');
-      btn.disabled = true; btn.textContent = 'Requesting...';
+      btn.disabled = true;
+      btn.textContent = 'Requesting...';
+
       try {
-        const r = await fetch(serverUrl + '/pair', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone }) });
+        const r = await fetch(serverUrl + '/pair', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
         const d = await r.json();
-        if (d.code) { document.getElementById('pairingCode').textContent = d.code; document.getElementById('pairingCodeBox').classList.add('show'); toast('Pairing code ready.', 'success'); }
-        else { toast(d.error || 'Failed', 'error'); }
-      } catch (e) { toast('Request failed: ' + e.message, 'error'); }
-      btn.disabled = false; btn.textContent = 'Get Pairing Code';
+        if (d.code) {
+          document.getElementById('pairingCode').textContent = d.code;
+          document.getElementById('pairingCodeBox').classList.add('show');
+          toast('Pairing code ready. Enter it in WhatsApp.', 'success');
+        } else {
+          toast(d.error || 'Failed to get pairing code', 'error');
+        }
+      } catch (e) {
+        toast('Request failed: ' + e.message, 'error');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Get Pairing Code';
     }
 
+    // ======================================================================
+    // DISCONNECT
+    // ======================================================================
     async function doDisconnect() {
       if (!serverUrl) return;
       if (!confirm('Unlink this WhatsApp account from waonline?')) return;
-      try { await fetch(serverUrl + '/disconnect', { method: 'POST' }); toast('Device unlinked.', ''); setStatus('disconnected'); clearMessages(); if (sse) { sse.close(); sse = null; } }
-      catch (e) { toast('Disconnect failed', 'error'); }
+      try {
+        await fetch(serverUrl + '/disconnect', { method: 'POST' });
+        toast('Device unlinked.', '');
+        setStatus('disconnected');
+        clearMessages();
+        if (sse) { sse.close(); sse = null; }
+      } catch (e) {
+        toast('Disconnect failed', 'error');
+      }
     }
 
     // ======================================================================
@@ -1412,311 +1216,88 @@
       messages.push(msg);
       chatSet.add(msg.chatId);
       updateStats();
-      const feed = document.getElementById('msgFeed');
+
+      const feed  = document.getElementById('msgFeed');
       const empty = document.getElementById('empty-state');
       if (empty) empty.remove();
-      const card = document.createElement('div');
-      const isGroup = msg.isGroup;
+
+      const card     = document.createElement('div');
+      const isGroup  = msg.isGroup;
       card.className = 'msg-card ' + (isGroup ? 'grp-card' : 'dm-card');
+
       const avLetter = (msg.pushName || 'W').charAt(0).toUpperCase();
-      const typeTag = isGroup ? '<span class="msg-type-tag tag-grp">Group</span>' : '<span class="msg-type-tag tag-dm">DM</span>';
-      const grpInfo = isGroup && msg.groupName ? '<span class="msg-group-name">in ' + escHtml(msg.groupName) + '</span>' : '';
-      const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '';
-      const isMedia = msg.text.startsWith('[') && msg.text.endsWith(']');
-      card.innerHTML = `<div class="msg-meta"><div class="msg-avatar ${isGroup?'grp':'dm'}">${escHtml(avLetter)}</div><span class="msg-sender">${escHtml(msg.pushName||'Unknown')}</span>${typeTag}${grpInfo}<span class="msg-time">${timeStr}</span></div><div class="msg-text ${isMedia?'media':''}">${escHtml(msg.text)}</div>`;
-      if (prepend) { feed.insertBefore(card, feed.firstChild); feed.scrollTop = 0; } else { feed.appendChild(card); }
+      const typeTag  = isGroup
+        ? '<span class="msg-type-tag tag-grp">Group</span>'
+        : '<span class="msg-type-tag tag-dm">DM</span>';
+      const grpInfo  = isGroup && msg.groupName
+        ? '<span class="msg-group-name">in ' + escHtml(msg.groupName) + '</span>'
+        : '';
+      const timeStr  = msg.timestamp
+        ? new Date(msg.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+        : '';
+      const isMedia  = msg.text.startsWith('[') && msg.text.endsWith(']');
+
+      card.innerHTML = `
+        <div class="msg-meta">
+          <div class="msg-avatar ${isGroup ? 'grp' : 'dm'}">${escHtml(avLetter)}</div>
+          <span class="msg-sender">${escHtml(msg.pushName || 'Unknown')}</span>
+          ${typeTag}
+          ${grpInfo}
+          <span class="msg-time">${timeStr}</span>
+        </div>
+        <div class="msg-text ${isMedia ? 'media' : ''}">${escHtml(msg.text)}</div>
+      `;
+
+      if (prepend) {
+        feed.insertBefore(card, feed.firstChild);
+        feed.scrollTop = 0;
+      } else {
+        feed.appendChild(card);
+      }
     }
 
     function escHtml(s) {
-      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return String(s || '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     function updateStats() {
-      document.getElementById('statMessages').textContent = messages.length;
-      document.getElementById('statChats').textContent = chatSet.size;
+      document.getElementById('statMessages').textContent  = messages.length;
+      document.getElementById('statChats').textContent     = chatSet.size;
       document.getElementById('msgCountBadge').textContent = messages.length + ' messages';
     }
 
     function clearMessages() {
-      messages = []; chatSet = new Set(); updateStats();
-      document.getElementById('msgFeed').innerHTML = '<div id="empty-state"><div class="empty-icon">&#x1F4AC;</div><div class="empty-text">Messages cleared.<br>New messages will appear here.</div></div>';
+      messages = [];
+      chatSet  = new Set();
+      updateStats();
+      document.getElementById('msgFeed').innerHTML =
+        '<div id="empty-state"><div class="empty-icon">&#x1F4AC;</div><div class="empty-text">Messages cleared.<br>New messages will appear here.</div></div>';
     }
 
     // ======================================================================
-    // NIM AI SECTION
-    // ======================================================================
-    let nimModelsLoaded = false;
-    let nimModels = [];
-    let nimChatHistory = [];
-    let nimStreamController = null;
-    let nimIsStreaming = false;
-
-    async function nimLoadModels() {
-      const select = document.getElementById('nimModelSelect');
-      const countEl = document.getElementById('nimModelCount');
-      select.innerHTML = '<option value="">Loading models...</option>';
-
-      try {
-        const r = await fetch(NV_BASE_URL + '/models', {
-          headers: { 'Authorization': 'Bearer ' + NV_API_KEY, 'Accept': 'application/json' }
-        });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        const d = await r.json();
-        nimModels = (d.data || []).sort((a, b) => a.id.localeCompare(b.id));
-        nimModelsLoaded = true;
-
-        select.innerHTML = '<option value="">-- Select a model --</option>';
-
-        // Group models by provider
-        const groups = {};
-        nimModels.forEach(m => {
-          const parts = m.id.split('/');
-          const provider = parts[0] || 'other';
-          if (!groups[provider]) groups[provider] = [];
-          groups[provider].push(m);
-        });
-
-        // Sort providers, nvidia first
-        const providers = Object.keys(groups).sort((a, b) => {
-          if (a === 'nvidia') return -1;
-          if (b === 'nvidia') return 1;
-          return a.localeCompare(b);
-        });
-
-        providers.forEach(provider => {
-          const optgroup = document.createElement('optgroup');
-          optgroup.label = provider.toUpperCase();
-          groups[provider].forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m.id;
-            opt.textContent = m.id;
-            optgroup.appendChild(opt);
-          });
-          select.appendChild(optgroup);
-        });
-
-        countEl.textContent = nimModels.length + ' models';
-
-        // Restore last used model
-        const lastModel = localStorage.getItem('nim_last_model');
-        if (lastModel && nimModels.find(m => m.id === lastModel)) {
-          select.value = lastModel;
-        }
-
-        document.getElementById('nimEmptyState').querySelector('.nim-empty-text').innerHTML =
-          'Select a model and start chatting.<br>' + nimModels.length + ' models available via NVIDIA NIM API.';
-
-      } catch (e) {
-        select.innerHTML = '<option value="">Failed to load models</option>';
-        countEl.textContent = 'Error';
-        toast('Failed to load NIM models: ' + e.message, 'error');
-      }
-    }
-
-    function nimClearChat() {
-      nimChatHistory = [];
-      if (nimStreamController) { nimStreamController.abort(); nimStreamController = null; }
-      nimIsStreaming = false;
-      const area = document.getElementById('nimChatArea');
-      area.innerHTML = '';
-      const empty = document.createElement('div');
-      empty.className = 'nim-empty';
-      empty.id = 'nimEmptyState';
-      empty.innerHTML = '<div class="nim-empty-icon">NIM</div><div class="nim-empty-text">Select a model and start chatting.<br>' + (nimModels.length || '--') + ' models available via NVIDIA NIM API.</div>';
-      area.appendChild(empty);
-      nimUpdateSendBtn();
-    }
-
-    function nimUpdateSendBtn() {
-      const btn = document.getElementById('nimSendBtn');
-      if (nimIsStreaming) {
-        btn.className = 'nim-stop-btn';
-        btn.textContent = 'Stop';
-        btn.onclick = nimStop;
-        btn.disabled = false;
-      } else {
-        btn.className = 'nim-send-btn';
-        btn.textContent = 'Send';
-        btn.onclick = nimSend;
-        btn.disabled = false;
-      }
-    }
-
-    function nimStop() {
-      if (nimStreamController) {
-        nimStreamController.abort();
-        nimStreamController = null;
-      }
-      nimIsStreaming = false;
-      nimUpdateSendBtn();
-    }
-
-    function nimAppendMsg(role, text, modelId) {
-      const area = document.getElementById('nimChatArea');
-      const empty = document.getElementById('nimEmptyState');
-      if (empty) empty.remove();
-
-      const div = document.createElement('div');
-      div.className = 'nim-msg ' + role;
-
-      if (role === 'assistant' && modelId) {
-        const label = document.createElement('div');
-        label.className = 'nim-msg-model';
-        label.textContent = modelId;
-        div.appendChild(label);
-      }
-
-      const content = document.createElement('div');
-      content.textContent = text;
-      div.appendChild(content);
-
-      area.appendChild(div);
-      area.scrollTop = area.scrollHeight;
-      return content;
-    }
-
-    function nimInputKeydown(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        if (nimIsStreaming) nimStop();
-        else nimSend();
-      }
-    }
-
-    // Auto-resize textarea
-    document.addEventListener('input', (e) => {
-      if (e.target.id === 'nimInput') {
-        e.target.style.height = 'auto';
-        e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px';
-      }
-    });
-
-    async function nimSend() {
-      const input = document.getElementById('nimInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const modelId = document.getElementById('nimModelSelect').value;
-      if (!modelId) {
-        toast('Select a model first', 'warn');
-        return;
-      }
-
-      // Save model preference
-      localStorage.setItem('nim_last_model', modelId);
-
-      // Add user message
-      nimChatHistory.push({ role: 'user', content: text });
-      nimAppendMsg('user', text);
-
-      input.value = '';
-      input.style.height = 'auto';
-
-      // Create assistant placeholder
-      const assistantContent = nimAppendMsg('assistant', '', modelId);
-      assistantContent.innerHTML = '<span class="thinking-dots">Thinking</span>';
-
-      nimIsStreaming = true;
-      nimUpdateSendBtn();
-
-      const controller = new AbortController();
-      nimStreamController = controller;
-
-      try {
-        const r = await fetch(NV_BASE_URL + '/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + NV_API_KEY,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: modelId,
-            messages: nimChatHistory.slice(-20), // Keep last 20 messages for context
-            max_tokens: 2048,
-            stream: true,
-            temperature: 0.7
-          }),
-          signal: controller.signal
-        });
-
-        if (!r.ok) {
-          const errBody = await r.text();
-          let errMsg = 'HTTP ' + r.status;
-          try { const ej = JSON.parse(errBody); errMsg = ej.detail || ej.title || ej.message || errMsg; } catch(e) {}
-          throw new Error(errMsg);
-        }
-
-        const reader = r.body.getReader();
-        const decoder = new TextDecoder();
-        let fullResponse = '';
-        let buffer = '';
-
-        assistantContent.textContent = '';
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || '';
-
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed || !trimmed.startsWith('data: ')) continue;
-            const jsonStr = trimmed.slice(6);
-            if (jsonStr === '[DONE]') continue;
-
-            try {
-              const chunk = JSON.parse(jsonStr);
-              const delta = chunk.choices?.[0]?.delta?.content;
-              if (delta) {
-                fullResponse += delta;
-                assistantContent.textContent = fullResponse;
-                document.getElementById('nimChatArea').scrollTop = document.getElementById('nimChatArea').scrollHeight;
-              }
-            } catch (e) {}
-          }
-        }
-
-        if (fullResponse) {
-          nimChatHistory.push({ role: 'assistant', content: fullResponse });
-        } else {
-          assistantContent.textContent = '[No response from model]';
-        }
-
-      } catch (e) {
-        if (e.name === 'AbortError') {
-          assistantContent.textContent += '\n[Stopped]';
-          const partial = assistantContent.textContent.replace('\n[Stopped]', '').trim();
-          if (partial) nimChatHistory.push({ role: 'assistant', content: partial });
-        } else {
-          assistantContent.textContent = 'Error: ' + e.message;
-          toast('NIM API error: ' + e.message, 'error');
-          // Remove the failed assistant message from history
-          nimChatHistory.pop(); // remove the user message too since it failed
-        }
-      }
-
-      nimIsStreaming = false;
-      nimStreamController = null;
-      nimUpdateSendBtn();
-    }
-
-    // ======================================================================
-    // INIT APP
+    // INIT APP (called after PIN unlock)
     // ======================================================================
     function initApp() {
       fetchAndConnect();
+
+      // QR auto-refresh every 20s
       qrTimer = setInterval(() => {
         const pill = document.getElementById('statusPill');
         if (pill.classList.contains('qr_ready')) fetchQR();
       }, 20000);
+
+      // Re-check server URL every 3 minutes if not online (handles server restart with new URL)
       setInterval(async () => {
         const pill = document.getElementById('statusPill');
         if (!pill.classList.contains('online') && !pill.classList.contains('connecting')) {
           const url = await fetchServerUrl();
-          if (url && url !== serverUrl) { serverUrl = url; document.getElementById('serverUrlInput').value = url; connectSSE(url); }
+          if (url && url !== serverUrl) {
+            serverUrl = url;
+            document.getElementById('serverUrlInput').value = url;
+            connectSSE(url);
+          }
         }
       }, 180000);
     }
@@ -1724,7 +1305,7 @@
     // ======================================================================
     // BOOT
     // ======================================================================
-    checkUnlock();
+    checkUnlock(); // show lock screen or init directly if already unlocked
   </script>
 </body>
 </html>
